@@ -1,6 +1,6 @@
 CC = gcc
 TETRIS_CFLAGS = -I brick_game/tetris/inc -I gui/cli/inc -Wall -Wextra -Werror
-TETRIS_OBJ_FILES = out/game.o out/main.o out/fsm.o
+TETRIS_OBJ_FILES = out/game.o out/main.o out/fsm.o out/gui.o
 
 # $< - входной исходный файл
 # $^ - все зависимости

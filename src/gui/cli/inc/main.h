@@ -2,13 +2,13 @@
 #define MAIN_H
 
 #include "game.h"
-#include <ncurses.h>
+#include "gui.h"
 #include <stdlib.h>
 
-void init_gui();
-void init_windows();
-void draw_game_win(WINDOW *win);
-void draw_figure_win(WINDOW *win);
-void draw_info_win(WINDOW *win);
+
+void game_loop();
+void get_input(UserAction_t *user_action);
+
+
 
 #endif

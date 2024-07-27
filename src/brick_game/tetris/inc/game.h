@@ -2,37 +2,20 @@
 #define GAME_H
 
 #include <stdbool.h>
-
-
-#define FIELD_HEIGHT 20
-#define FIELD_WIDTH 10
-#define INFO_HEIGHT 20
-#define INFO_WIDTH 50
-
-
-typedef enum {
-    Start,
-    Pause,
-    Terminate,
-    Left,
-    Right,
-    Up,
-    Down,
-    Action
-} UserAction_t;
-
-typedef struct {
-    int **field;
-    int **next;
-    int score;
-    int high_score;
-    int level;
-    int speed;
-    int pause;
-} GameInfo_t;
+#include <stdlib.h>
+#include <time.h>
+#include "fsm.h"
+#include "objects.h"
 
 void userInput(UserAction_t action, bool hold);
 GameInfo_t updateCurrentState();
 
+void init_game(Tetris *tetris);
+int** allocate_field(int height, int width);
+void game_loop();
+void place_next(int shape[4][4]);
+Tetris* get_tetris();
+int game_over();
+void init_tetro(Tetris *tetris);
 
 #endif
