@@ -1,7 +1,7 @@
 #include "game.h"
 
 void init_game(Tetris *tetris) {
-    tetris->info.field = allocate_field(FIELD_HEIGHT, FIELD_WIDTH);
+    tetris->info.field = allocate_field(FIELD_HEIGHT + 4, FIELD_WIDTH);
     tetris->info.next = allocate_field(4, 4);
     tetris->info.score = 0;
     tetris->info.high_score = 0;
@@ -11,7 +11,7 @@ void init_game(Tetris *tetris) {
 }
 
 void init_tetro(Tetris *tetris) {
-    tetris->tetro.x = 5;
+    tetris->tetro.x = 0;
     tetris->tetro.y = 0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -64,3 +64,14 @@ Tetris* get_tetris() {
     return &tetris;
 }
 
+void plant_tetro() {
+    Tetris *tetris = get_tetris();
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (tetris->tetro.shape[i][j] == 1) {
+                tetris->info.field[i + tetris->tetro.y][ j + tetris->tetro.x] = 1;
+            }
+        }
+    }
+}

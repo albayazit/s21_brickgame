@@ -3,8 +3,6 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
-#include <time.h>
-#include "fsm.h"
 #include "objects.h"
 
 void userInput(UserAction_t action, bool hold);
@@ -17,5 +15,6 @@ void place_next(int shape[4][4]);
 Tetris* get_tetris();
 int game_over();
 void init_tetro(Tetris *tetris);
+void plant_tetro();
 
 #endif

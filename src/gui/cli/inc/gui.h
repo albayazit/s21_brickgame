@@ -1,9 +1,9 @@
 #ifndef GUI_H
 #define GUI_H
 
-#include <ncurses.h>
+
 #include "objects.h"
- 
+#include <ncurses.h>
 
 typedef struct {
     WINDOW *game_win;

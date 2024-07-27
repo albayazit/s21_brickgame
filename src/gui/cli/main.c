@@ -2,7 +2,7 @@
 #include <locale.h>
 
 int main() {
-    srand(time(NULL));
+    srand(time(0));
     setlocale(LC_ALL, "en_US.UTF-8");
     init_gui();
     game_loop();
@@ -36,7 +36,7 @@ void get_input(UserAction_t *user_action) {
     case 'p':
         *user_action = Pause;
         break;
-    case 's':
+    case KEY_LEFT:
         *user_action = Left;
         break;
     case KEY_RIGHT:

@@ -3,6 +3,7 @@
 
 #include "game.h"
 #include "gui.h"
+#include <time.h> 
 #include <stdlib.h>
 
 

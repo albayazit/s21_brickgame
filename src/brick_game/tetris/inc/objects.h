@@ -7,8 +7,6 @@
 #define INFO_HEIGHT 20
 #define INFO_WIDTH 50
 
-#define RANDOM_TETRO rand()%7
-
 typedef enum
 {
     START = 0,
