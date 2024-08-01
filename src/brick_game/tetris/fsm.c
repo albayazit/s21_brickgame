@@ -105,14 +105,10 @@ void userInput(UserAction_t action, bool hold) {
                     move_right(&tetris->tetro);
                     break;
                 case Left:
-                    clear_tetro();
                     move_left(&tetris->tetro);
-                    plant_tetro();
                     break;
                 case Action:
-                    clear_tetro();
                     rotation(&tetris->tetro);
-                    plant_tetro();
                     break;
                 case Terminate:
                     tetris->state = EXIT_STATE;
@@ -182,7 +178,7 @@ int is_game_over() {
 void check_line_fill() {
     int count = 0;
     Tetris *tetris = get_tetris();
-    for (int i = 0; i < FIELD_HEIGHT; i++) {
+    for (int i = 0; i < FIELD_HEIGHT + 1; i++) {
         for (int j = 0; j < FIELD_WIDTH; j++) {
             if (tetris->info.field[i][j] == 1) {
                 count++;
@@ -274,6 +270,7 @@ void move_right(Tetromino *tetro) {
 
 void rotation(Tetromino *tetro) {
     int temp[4][4];
+    clear_tetro();
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             temp[j][4 - 1 - i] = tetro->shape[i][j];
@@ -287,6 +284,7 @@ void rotation(Tetromino *tetro) {
             }
         }
     }
+    plant_tetro();
 }
 
 int check_rotate_collision(int temp[4][4], int x, int y) {
@@ -299,7 +297,7 @@ int check_rotate_collision(int temp[4][4], int x, int y) {
     } else {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                if (temp[i][j] == 1 && tetris->info.field[i + y][j + x] == 1) {
+                if ((temp[i][j] == 1 && tetris->info.field[i + y][j + x] == 1) || tetris->tetro.y == 0) {
                     result = 0;
                     break;
                 }

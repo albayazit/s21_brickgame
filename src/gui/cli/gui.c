@@ -38,7 +38,7 @@ void draw_game_win(WINDOW *win, GameInfo_t *game) {
     for (int row = 0; row < FIELD_HEIGHT + 1; row++) {
         for (int col = 0; col < FIELD_WIDTH; col++) {
             if (game->field[row][col] == 1) {
-                mvwprintw(win, row, 2 * col + 1, "%s", "█");
+                mvwprintw(win, row, 2 * col + 1, "%s", "█"); // +1 - границы
                 mvwprintw(win, row, 2 * col + 2, "%s", "█");
             } else {
                 mvwprintw(win, row, 2 * col + 1, "%s", " ");
