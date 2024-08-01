@@ -15,6 +15,7 @@ typedef enum
     SHIFTING,
     ATTACHING,
     GAMEOVER,
+    PAUSE,
     EXIT_STATE
 } GameState;
 
@@ -48,6 +49,7 @@ typedef struct {
     GameInfo_t info;
     GameState state;
     Tetromino tetro;
+    int is_start;
 } Tetris;
 
 #endif

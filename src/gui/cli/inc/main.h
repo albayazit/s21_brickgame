@@ -8,7 +8,7 @@
 
 
 void game_loop();
-void get_input(UserAction_t *user_action);
+void get_input(UserAction_t *action);
 
 
 

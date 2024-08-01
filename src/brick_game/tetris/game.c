@@ -1,17 +1,19 @@
 #include "game.h"
 
 void init_game(Tetris *tetris) {
-    tetris->info.field = allocate_field(FIELD_HEIGHT + 4, FIELD_WIDTH);
+    tetris->info.field = allocate_field(FIELD_HEIGHT + 2, FIELD_WIDTH);
     tetris->info.next = allocate_field(4, 4);
     tetris->info.score = 0;
     tetris->info.high_score = 0;
     tetris->info.level = 1;
     tetris->info.pause = 0;
     tetris->info.speed = 1;
+
+    tetris->is_start = 1;
 }
 
 void init_tetro(Tetris *tetris) {
-    tetris->tetro.x = 0;
+    tetris->tetro.x = 3;
     tetris->tetro.y = 0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -25,6 +27,7 @@ void place_next(int shape[4][4]) {
     Tetris* tetris = get_tetris();
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
+            tetris->info.next[i][j] = 0;
             if (shape[i][j] == 1) {
                 tetris->info.next[i][j] = 1;
             }
@@ -71,6 +74,18 @@ void plant_tetro() {
         for (int j = 0; j < 4; j++) {
             if (tetris->tetro.shape[i][j] == 1) {
                 tetris->info.field[i + tetris->tetro.y][ j + tetris->tetro.x] = 1;
+            }
+        }
+    }
+}
+
+
+void clear_tetro() {
+    Tetris *tetris = get_tetris();
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (tetris->info.field[i + tetris->tetro.y][j + tetris->tetro.x] == 1 && tetris->tetro.shape[i][j] == 1) {
+                tetris->info.field[i + tetris->tetro.y][j + tetris->tetro.x] = 0;
             }
         }
     }

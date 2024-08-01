@@ -35,11 +35,14 @@ void init_windows(Windows *windows) {
 
 void draw_game_win(WINDOW *win, GameInfo_t *game) {
     wbkgd(win, COLOR_PAIR(1));
-    for (int row = 0; row < FIELD_HEIGHT; row++) {
+    for (int row = 0; row < FIELD_HEIGHT + 1; row++) {
         for (int col = 0; col < FIELD_WIDTH; col++) {
             if (game->field[row][col] == 1) {
-                mvwprintw(win, row + 1, 2 * col + 1, "%s", "█");
-                mvwprintw(win, row + 1, 2 * col + 2, "%s", "█");
+                mvwprintw(win, row, 2 * col + 1, "%s", "█");
+                mvwprintw(win, row, 2 * col + 2, "%s", "█");
+            } else {
+                mvwprintw(win, row, 2 * col + 1, "%s", " ");
+                mvwprintw(win, row, 2 * col + 2, "%s", " ");
             }
         }
     }
@@ -53,6 +56,9 @@ void draw_figure_win(WINDOW *win, GameInfo_t *game) {
             if (game->next[i][j] == 1) {
                 mvwprintw(win, i + 3, 2 * j + 4, "%s", "█");
                 mvwprintw(win, i + 3, 2 * j + 5, "%s", "█");
+            } else {
+                mvwprintw(win, i + 3, 2 * j + 4, "%s", " ");
+                mvwprintw(win, i + 3, 2 * j + 5, "%s", " ");
             }
         }
     }

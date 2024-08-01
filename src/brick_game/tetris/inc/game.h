@@ -16,5 +16,6 @@ Tetris* get_tetris();
 int game_over();
 void init_tetro(Tetris *tetris);
 void plant_tetro();
+void clear_tetro();
 
 #endif
