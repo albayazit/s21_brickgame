@@ -17,6 +17,7 @@ void init_windows(Windows *windows);
 void draw_game_win(WINDOW *win, GameInfo_t *game);
 void draw_figure_win(WINDOW *win, GameInfo_t *game);
 void draw_info_win(WINDOW *win, GameInfo_t *game);
+void draw_status(WINDOW *win, int status);
 
 
 

@@ -113,6 +113,10 @@ void userInput(UserAction_t action, bool hold) {
                 case Terminate:
                     tetris->state = EXIT_STATE;
                     break;
+                case Pause:
+                    tetris->info.pause = 1;
+                    tetris->state = PAUSE;
+                    break;
                 default:
                     break;
             }
@@ -155,8 +159,13 @@ void userInput(UserAction_t action, bool hold) {
                 tetris->state = SPAWN;
             }
             break;
-        case GAMEOVER:
-            exit(0);
+        case PAUSE:
+            if (action == Pause) {
+                tetris->state = MOVING;
+                tetris->info.pause = 0;
+            } else if (action == Terminate) {
+                tetris->state = EXIT_STATE;
+            }
             break;
         default:
             break;

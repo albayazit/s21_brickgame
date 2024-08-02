@@ -49,16 +49,35 @@ void draw_game_win(WINDOW *win, GameInfo_t *game) {
     box(win, 0, 0);
 }
 
+void draw_status(WINDOW *win, int status) {
+    switch (status)
+    {
+    case 0:
+        mvwprintw(win, 2, 3, "%s", "🎮 Tetris 🎮");
+        break;
+    case 1:
+        mvwprintw(win, 2, 3, "%s", "              ");
+        mvwprintw(win, 2, 6, "%s", "Pause");
+        break;
+    case 2:
+        mvwprintw(win, 2, 3, "%s", "              ");
+        mvwprintw(win, 2, 4, "%s", "Game Over");
+        break;
+    default:
+        break;
+    }
+}
+
 void draw_figure_win(WINDOW *win, GameInfo_t *game) {
     wbkgd(win, COLOR_PAIR(1));
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             if (game->next[i][j] == 1) {
-                mvwprintw(win, i + 3, 2 * j + 4, "%s", "█");
                 mvwprintw(win, i + 3, 2 * j + 5, "%s", "█");
+                mvwprintw(win, i + 3, 2 * j + 6, "%s", "█");
             } else {
-                mvwprintw(win, i + 3, 2 * j + 4, "%s", " ");
                 mvwprintw(win, i + 3, 2 * j + 5, "%s", " ");
+                mvwprintw(win, i + 3, 2 * j + 6, "%s", " ");
             }
         }
     }
@@ -67,17 +86,16 @@ void draw_figure_win(WINDOW *win, GameInfo_t *game) {
 
 void draw_info_win(WINDOW *win, GameInfo_t *game) {
     wbkgd(win, COLOR_PAIR(1));
-    mvwprintw(win, 3, 2, "%s", "SCORE |");
-    mvwprintw(win, 3, 10, "%d", game->score);
+    mvwprintw(win, 4, 2, "%s", "SCORE |");
+    mvwprintw(win, 4, 10, "%d", game->score);
 
-    mvwprintw(win, 5, 2, "%s", "LEVEL |");
-    mvwprintw(win, 5, 10, "%d", game->level);
+    mvwprintw(win, 6, 2, "%s", "LEVEL |");
+    mvwprintw(win, 6, 10, "%d", game->level);
 
-    mvwprintw(win, 7, 2, "%s", "SPEED |");
-    mvwprintw(win, 7, 10, "%d", game->speed);
+    mvwprintw(win, 8, 2, "%s", "SPEED |");
+    mvwprintw(win, 8, 10, "%d", game->speed);
 
-    mvwprintw(win, 9, 2, "%s", "RECORD |");
-    mvwprintw(win, 9, 11, "%d", game->high_score);
+    mvwprintw(win, 10, 2, "%s", "RECORD |");
+    mvwprintw(win, 10, 11, "%d", game->high_score);
     box(win, 0, 0);
 }
-
