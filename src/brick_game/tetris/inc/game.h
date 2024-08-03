@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "objects.h"
 #include <sys/time.h>
+#include <stdio.h>
 
 void userInput(UserAction_t action, bool hold);
 GameInfo_t updateCurrentState();
@@ -30,5 +31,7 @@ int is_x_collision(int shape[4][4], int x);
 void check_line_fill();
 void move_lines(int height);
 int is_game_over();
+void save_high_score(const char *filename, int high_score);
+int load_high_score(const char *filename);
 
 #endif

@@ -4,7 +4,7 @@ void init_game(Tetris *tetris) {
     tetris->info.field = allocate_field(FIELD_HEIGHT + 3, FIELD_WIDTH);
     tetris->info.next = allocate_field(4, 4);
     tetris->info.score = 0;
-    tetris->info.high_score = 0;
+    tetris->info.high_score = load_high_score("db.txt");
     tetris->info.level = 1;
     tetris->info.pause = 0;
     tetris->info.speed = 1;
@@ -68,6 +68,7 @@ void clear_tetro() {
 void check_line_fill() {
     int count = 0;
     Tetris *tetris = get_tetris();
+    int lines = 0;
     for (int i = 0; i < FIELD_HEIGHT + 1; i++) {
         for (int j = 0; j < FIELD_WIDTH; j++) {
             if (tetris->info.field[i][j] == 1) {
@@ -79,8 +80,22 @@ void check_line_fill() {
                 tetris->info.field[i][j] = 0;
             }
             move_lines(i);
+            lines++;
         }
         count = 0;
+    }
+    if (lines == 1)
+        tetris->info.score += 100;
+    else if (lines == 2)
+        tetris->info.score += 300;
+    else if (lines == 3)
+        tetris->info.score += 700;
+    else if (lines == 4) 
+        tetris->info.score += 1500;
+
+    if (tetris->info.score > tetris->info.high_score) {
+        tetris->info.high_score = tetris->info.score;
+        save_high_score("db.txt", tetris->info.high_score);
     }
 }
 
@@ -255,4 +270,27 @@ int game_over() {
         flag = 0;
     }
     return flag;
+}
+
+void save_high_score(const char *filename, int high_score) {
+    FILE *file = fopen(filename, "w");
+    if (file == NULL) {
+        perror("Unable to open file for writing");
+        return;
+    }
+    fprintf(file, "%d\n", high_score);
+    fclose(file);
+}
+
+int load_high_score(const char *filename) {
+    int high_score = 0;
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        perror("Unable to open file for reading");
+        high_score = 0; // Если файл не найден, возвращаем 0
+    } else {
+        fscanf(file, "%d", &high_score);
+    }
+    fclose(file);
+    return high_score;
 }
