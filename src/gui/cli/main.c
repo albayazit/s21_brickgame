@@ -7,7 +7,6 @@ int main() {
     setlocale(LC_ALL, "en_US.UTF-8");
     init_gui();
     game_loop();
-    while (getch() == EOF){};
     endwin();
     return 0;
 }
@@ -16,6 +15,8 @@ void game_loop() {
     Windows windows;
     GameInfo_t game_info;
     UserAction_t user_action;
+    bool hold = FALSE;
+    int ch;
     init_gui();
     init_windows(&windows);
     while (game_over()) {
@@ -25,17 +26,21 @@ void game_loop() {
         } else {
             draw_status(windows.info_win, 0);
         }
-        userInput(user_action, FALSE);
+        userInput(user_action, hold);
         draw_windows(&windows, &game_info);
-        get_input(&user_action);
+        ch = getch();
+        get_input(&user_action, &ch, &hold);
         usleep(10000);
     }
-    draw_status(windows.info_win, 2);
-    draw_windows(&windows, &game_info);
+    if (get_state() == GAMEOVER) {
+        draw_status(windows.info_win, 2);
+        draw_windows(&windows, &game_info);
+        while (getch() == EOF) {}
+    }
 }
 
-void get_input(UserAction_t *action) {
-    switch (getch())
+void get_input(UserAction_t *action, int *ch, bool *hold) {
+    switch (*ch)
     {
     case '\n':
     case '\r':
@@ -48,11 +53,16 @@ void get_input(UserAction_t *action) {
     case KEY_LEFT:
         *action = Left;
         break;
-    case KEY_RIGHT:
-        *action = Right;
-        break;
     case KEY_DOWN:
         *action = Down;
+        *hold = TRUE;
+        break;
+    case 'c':
+        *action = Down;
+        *hold = FALSE;
+        break;
+    case KEY_RIGHT:
+        *action = Right;
         break;
     case ' ':
         *action = Action;
@@ -64,4 +74,4 @@ void get_input(UserAction_t *action) {
         *action = Up;
         break;
     }
-} 
+};

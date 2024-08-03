@@ -3,13 +3,12 @@
 
 #include "game.h"
 #include "gui.h"
-#include <time.h> 
 #include <stdlib.h>
+#include <sys/time.h>
 
 
 void game_loop();
-void get_input(UserAction_t *action);
-
+void get_input(UserAction_t *action, int *ch, bool *hold);
 
 
 #endif

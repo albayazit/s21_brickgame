@@ -2,20 +2,13 @@
 #define FSM_H
 
 #include "game.h"
-#include <sys/time.h>
 #include "objects.h"
 
-void move_left(Tetromino *tetro);
-void move_right(Tetromino *tetro);
-void rotation(Tetromino *tetro);
-int check_timeout();
-int check_rotate_collision(int temp[4][4], int x, int y);
-int is_y_collision(int shape[4][4], int y);
-void place_tetro();
-void clear_current_tetro();
-int is_x_collision(int shape[4][4], int x);
-void check_line_fill();
-void move_lines(int height);
-int is_game_over();
+void moving_state(UserAction_t *action, bool *hold, int *is_down);
+void start_state(UserAction_t *action);
+void spawn_state();
+void shifting_state(int *is_attached, int *is_down);
+void attaching_state();
+void pause_state(UserAction_t *action);
 
 #endif

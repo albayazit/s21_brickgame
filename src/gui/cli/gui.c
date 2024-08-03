@@ -7,7 +7,7 @@ void init_gui() {
     curs_set(0);
     start_color();
     nodelay(stdscr, TRUE);
-    init_pair(1, COLOR_GREEN, COLOR_BLACK); 
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);
     keypad(stdscr, TRUE);
 }
 
