@@ -8,7 +8,7 @@
 
 
 void game_loop();
-void get_input(UserAction_t *action, int *ch, bool *hold);
+void get_input(UserAction_t *action, int *ch, bool *hold, int *start);
 
 
 #endif

@@ -12,8 +12,9 @@ void init_gui() {
 }
 
 
-void draw_windows(Windows *windows, GameInfo_t *game) {
-    draw_game_win(windows->game_win, game);
+void draw_windows(Windows *windows, GameInfo_t *game, int is_game) {
+    if (is_game == 0)
+        draw_game_win(windows->game_win, game);
     draw_figure_win(windows->next_fig_win, game);
     draw_info_win(windows->info_win, game);
     refresh();
@@ -66,6 +67,21 @@ void draw_status(WINDOW *win, int status) {
     default:
         break;
     }
+}
+
+void draw_start(WINDOW *win) {
+    wbkgd(win, COLOR_PAIR(1));
+    mvwprintw(win, 5, 2, "%s", "Control:");
+    mvwprintw(win, 6, 2, "%s", "-----------------");
+    mvwprintw(win, 6, 2, "%s", "Enter - start");
+    mvwprintw(win, 7, 2, "%s", "Space - rotation");
+    mvwprintw(win, 8, 2, "%s", "p - pause");
+    mvwprintw(win, 9, 2, "%s", "c - quickly down");
+    mvwprintw(win, 10, 2, "%s", "← - to left");
+    mvwprintw(win, 11, 2, "%s", "→ - to right");
+    mvwprintw(win, 12, 2, "%s", "↓ - slow down");
+    mvwprintw(win, 13, 2, "%s", "q - terminate");
+    box(win, 0, 0);
 }
 
 void draw_figure_win(WINDOW *win, GameInfo_t *game) {

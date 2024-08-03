@@ -85,7 +85,7 @@ void check_line_fill() {
         count = 0;
     }
     if (lines == 1)
-        tetris->info.score += 100;
+        tetris->info.score += 12000;
     else if (lines == 2)
         tetris->info.score += 300;
     else if (lines == 3)
@@ -96,6 +96,13 @@ void check_line_fill() {
     if (tetris->info.score > tetris->info.high_score) {
         tetris->info.high_score = tetris->info.score;
         save_high_score("db.txt", tetris->info.high_score);
+    }
+    int new_level = tetris->info.score / 600 + 1;
+    if ((new_level >= tetris->info.level)) {
+        if (new_level > 10)
+            new_level = 10;
+        tetris->info.level = new_level;
+        tetris->info.speed = new_level;
     }
 }
 
@@ -133,6 +140,7 @@ void place_tetro() {
 
 int check_timeout() {
     int result = 0;
+    Tetris *tetris = get_tetris();
     static struct timeval last_time;
     struct timeval current_time;
     gettimeofday(&current_time, NULL);
@@ -142,7 +150,7 @@ int check_timeout() {
     long elapsed_time = (current_time.tv_sec - last_time.tv_sec) * 1000000 + 
                         (current_time.tv_usec - last_time.tv_usec);
 
-    if (elapsed_time >= 1000000) {
+    if (elapsed_time >= 1000000 - 80000 * tetris->info.level) {
         last_time = current_time;
         result = 1;
     }
