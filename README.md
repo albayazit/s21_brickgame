@@ -1,6 +1,6 @@
 # Brickgame
 
-Implementation of a Tetris library in C, using the ncurses library. Based on a state machine, the game logic is divided into server-side and client-side components.
+Implementation of a Tetris library in C, using the ncurses for gui. Based on a state machine, the game logic is divided into server-side and client-side components.
 
 ### Usage
 ``` make && ./tetris ```
