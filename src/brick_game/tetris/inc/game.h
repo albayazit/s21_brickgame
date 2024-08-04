@@ -2,18 +2,19 @@
 #define GAME_H
 
 #include <stdbool.h>
-#include <stdlib.h>
-#include "objects.h"
-#include <sys/time.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+#include "objects.h"
 
 void userInput(UserAction_t action, bool hold);
 GameInfo_t updateCurrentState();
 void init_game(Tetris *tetris);
-int** allocate_field(int height, int width);
+int **allocate_field(int height, int width);
 void game_loop();
 void place_next(int shape[4][4]);
-Tetris* get_tetris();
+Tetris *get_tetris();
 int game_over();
 void init_tetro(Tetris *tetris);
 void plant_tetro();
@@ -33,5 +34,6 @@ void move_lines(int height);
 int is_game_over();
 void save_high_score(const char *filename, int high_score);
 int load_high_score(const char *filename);
+void free_fields();
 
 #endif

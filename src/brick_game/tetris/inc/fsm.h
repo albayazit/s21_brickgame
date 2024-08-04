@@ -4,6 +4,7 @@
 #include "game.h"
 #include "objects.h"
 
+int get_random_tet();
 void moving_state(UserAction_t *action, bool *hold, int *is_down);
 void start_state(UserAction_t *action);
 void spawn_state();

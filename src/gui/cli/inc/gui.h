@@ -1,14 +1,17 @@
 #ifndef GUI_H
 #define GUI_H
 
-
-#include "objects.h"
 #include <ncurses.h>
 
+#include "objects.h"
+
+/**
+ * @brief Structure representing the ncurses windows.
+ */
 typedef struct {
-    WINDOW *game_win;
-    WINDOW *next_fig_win;
-    WINDOW *info_win;
+  WINDOW *game_win;
+  WINDOW *next_fig_win;
+  WINDOW *info_win;
 } Windows;
 
 void init_gui();
@@ -19,7 +22,5 @@ void draw_figure_win(WINDOW *win, GameInfo_t *game);
 void draw_info_win(WINDOW *win, GameInfo_t *game);
 void draw_status(WINDOW *win, int status);
 void draw_start(WINDOW *win);
-
-
 
 #endif
