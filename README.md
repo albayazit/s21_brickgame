@@ -5,6 +5,10 @@ Implementation of a Tetris library in C, using the ncurses for gui. Based on a s
 ### Usage
 ``` make && ./tetris ```
 
+### Screenshots
+![FSM](misc/game.png)
+![FSM](misc/game_preview.png)
+
 ### Targets
 ``` make test ``` - Unit testing using the **check** library\
 ``` make gcov_report ``` - Code coverage using **gcov**\
