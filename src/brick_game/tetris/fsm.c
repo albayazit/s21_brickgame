@@ -1,3 +1,6 @@
+#ifndef SRC_BRICK_GAME_TETRIS_FSM_C
+#define SRC_BRICK_GAME_TETRIS_FSM_C
+
 #include "fsm.h"
 
 /**
@@ -62,28 +65,42 @@ int get_random_tet() {
  */
 void userInput(UserAction_t action, bool hold) {
   Tetris *tetris = get_tetris();
-
-  static int is_attached = 0;
-  static int is_down = 0;
-
+  tetris->is_down = 0;
   switch (tetris->state) {
     case START:
-      start_state(&action);
+      if (action == Start) {
+        tetris->state = SPAWN;
+      }
       break;
+    case MOVING:
+      moving_state(&action, &hold, &tetris->is_down);
+      break;
+    case PAUSE:
+      pause_state(&action);
+      break;
+    default:
+      break;
+  }
+}
+
+void updateGame() {
+  Tetris *tetris = get_tetris();
+  static int is_attached = 0;
+
+  switch (tetris->state) {
     case SPAWN:
       spawn_state();
       break;
     case MOVING:
-      moving_state(&action, &hold, &is_down);
+      if (check_timeout()) {
+        tetris->state = SHIFTING;
+      }
       break;
     case SHIFTING:
-      shifting_state(&is_attached, &is_down);
+      shifting_state(&is_attached, &tetris->is_down);
       break;
     case ATTACHING:
       attaching_state();
-      break;
-    case PAUSE:
-      pause_state(&action);
       break;
     default:
       break;
@@ -190,30 +207,6 @@ void spawn_state() {
 }
 
 /**
- * @brief Handles the start state in the Tetris game.
- *
- * This function processes the user's action when the game is in the start
- * state. It transitions to the SPAWN state if the action is to start the game
- * or to EXIT_STATE if the action is to terminate the game.
- *
- * @param action Pointer to the user action to be processed.
- */
-void start_state(UserAction_t *action) {
-  Tetris *tetris = get_tetris();
-  switch (*action) {
-    case Start:
-      tetris->state = SPAWN;
-      break;
-    case Terminate:
-      tetris->state = EXIT_STATE;
-      break;
-    default:
-      tetris->state = START;
-      break;
-  }
-}
-
-/**
  * @brief Handles the moving state in the Tetris game.
  *
  * This function processes user actions when the tetromino is moving.
@@ -258,7 +251,6 @@ void moving_state(UserAction_t *action, bool *hold, int *is_down) {
     default:
       break;
   }
-  if (check_timeout()) {
-    tetris->state = SHIFTING;
-  }
 }
+
+#endif

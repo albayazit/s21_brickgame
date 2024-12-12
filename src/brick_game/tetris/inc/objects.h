@@ -1,10 +1,12 @@
-#ifndef OBJECTS_H
-#define OBJECTS_H
+#ifndef SRC_BRICK_GAME_TETRIS_INC_OBJECTS_H
+#define SRC_BRICK_GAME_TETRIS_INC_OBJECTS_H
 
 #define FIELD_HEIGHT 20
 #define FIELD_WIDTH 10
 #define INFO_HEIGHT 20
 #define INFO_WIDTH 50
+
+#include "brickgame_api.h"
 
 /**
  * @brief Enum representing the different states of the game.
@@ -18,34 +20,7 @@ typedef enum {
   GAMEOVER,
   PAUSE,
   EXIT_STATE
-} GameState;
-
-/**
- * @brief Enum representing user actions during the game.
- */
-typedef enum {
-  Start,
-  Pause,
-  Terminate,
-  Left,
-  Right,
-  Up,
-  Down,
-  Action
-} UserAction_t;
-
-/**
- * @brief Structure containing game information.
- */
-typedef struct {
-  int **field;
-  int **next;
-  int score;
-  int high_score;
-  int level;
-  int speed;
-  int pause;
-} GameInfo_t;
+} TetrisState;
 
 /**
  * @brief Structure representing a tetromino.
@@ -60,9 +35,10 @@ typedef struct {
  */
 typedef struct {
   GameInfo_t info;
-  GameState state;
+  TetrisState state;
   Tetromino tetro;
   int is_start;
+  int is_down;
 } Tetris;
 
 #endif

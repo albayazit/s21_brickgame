@@ -1,3 +1,6 @@
+#ifndef SRC_BRICK_GAME_TETRIS_GAME_C
+#define SRC_BRICK_GAME_TETRIS_GAME_C
+
 #include "game.h"
 
 /**
@@ -13,12 +16,12 @@ void init_game(Tetris *tetris) {
   tetris->info.field = allocate_field(FIELD_HEIGHT + 3, FIELD_WIDTH);
   tetris->info.next = allocate_field(4, 4);
   tetris->info.score = 0;
-  tetris->info.high_score = load_high_score("db.txt");
+  tetris->info.high_score = load_high_score("tetris_bd.txt");
   tetris->info.level = 1;
   tetris->info.pause = 0;
   tetris->info.speed = 1;
-
   tetris->is_start = 1;
+  tetris->is_down = 0;
 }
 
 void free_fields() {
@@ -163,7 +166,7 @@ void check_line_fill() {
 
   if (tetris->info.score > tetris->info.high_score) {
     tetris->info.high_score = tetris->info.score;
-    save_high_score("db.txt", tetris->info.high_score);
+    save_high_score("tetris_bd.txt", tetris->info.high_score);
   }
   int new_level = tetris->info.score / 600 + 1;
   if ((new_level >= tetris->info.level)) {
@@ -415,7 +418,7 @@ GameInfo_t updateCurrentState() { return get_tetris()->info; }
  *
  * @return The current game state.
  */
-GameState get_state() {
+TetrisState get_state() {
   Tetris *tetris = get_tetris();
   return tetris->state;
 }
@@ -512,3 +515,5 @@ int load_high_score(const char *filename) {
   fclose(file);
   return high_score;
 }
+
+#endif

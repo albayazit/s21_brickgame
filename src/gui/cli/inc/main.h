@@ -1,13 +1,18 @@
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef SRC_GUI_CLI_INC_MAIN_H
+#define SRC_GUI_CLI_INC_MAIN_H
 
+#include <locale.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <unistd.h>
 
-#include "game.h"
 #include "gui.h"
+#include "snake_controller_wrapper_c.h"
+#include "tetris_controller.h"
 
-void game_loop();
-void get_input(UserAction_t *action, int *ch, bool *hold, int *start);
+void show_menu(WINDOW* win);
+bool get_input(UserAction_t* action);
+void runSnakeGame();
+void runTetrisGame();
 
 #endif

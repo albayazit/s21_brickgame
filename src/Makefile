@@ -1,55 +1,88 @@
-CC = gcc
-TETRIS_CFLAGS = -I brick_game/tetris/inc -I gui/cli/inc -Wall -Wextra -Werror --coverage
-TETRIS_OBJ_FILES = out/game.o out/main.o out/fsm.o out/gui.o
-BACKEND_OBJ_FILES = out/game.o out/fsm.o  out/tests.o
-TARGET = tetris
-BINDIR = out
-ARCHIVE_NAME = backup.tar.gz
-SRC = brick_game/ gui/ Doxyfile
-TEST_FLAGS = -I brick_game/tetris/inc -lcheck --coverage -lm -pthread
-# $< - входной исходный файл
-# $^ - все зависимости
-# $@ - имя цели
+PROJECT_NAME = BrickGame
 
-# Основные цели
-.PHONY: all install uninstall clean dvi dist
+BUILD_DIR = build
+DIST_DIR = dist
+INSTALL_DIR = /usr/local/bin
+SOURCE_DIR = ../../
+QT_CMAKE_PATH = /opt/homebrew/Cellar/qt/6.7.3/lib/cmake
+COVERAGE_DIR = $(PWD)/$(BUILD_DIR)/coverage
+LCOV = lcov
+GENHTML = genhtml
 
-all: create_dir $(TARGET)
 
-$(TARGET): $(TETRIS_OBJ_FILES)
-	$(CC) $(TETRIS_CFLAGS) $^ -o $@ -lncurses
-install: all
-	install -m755 $(TARGET) $(BINDIR)/$(TARGET)
+CXX = g++
+CMAKE = cmake
+MAKE = make
+INSTALL = install
+
+.PHONY: all desktop cli install install-desktop install-cli uninstall clean dvi dist test test-tetris test-snake clang coverage
+
+all: desktop cli
+
+desktop:
+	@echo "Building Desktop version..."
+	@mkdir -p $(BUILD_DIR)/desktop
+	cd $(BUILD_DIR)/desktop && $(CMAKE) -DCMAKE_PREFIX_PATH=$(QT_CMAKE_PATH) -DBUILD_DESKTOP=ON $(SOURCE_DIR)
+	cd $(BUILD_DIR)/desktop && $(MAKE)
+
+cli:
+	@echo "Building CLI version..."
+	@mkdir -p $(BUILD_DIR)/cli
+	cd $(BUILD_DIR)/cli && $(CMAKE) -DBUILD_DESKTOP=OFF $(SOURCE_DIR)
+	cd $(BUILD_DIR)/cli && $(MAKE)
+
+install-desktop: desktop
+	@echo "Installing Desktop version to $(INSTALL_DIR)..."
+	@mkdir -p $(DIST_DIR)/desktop
+	cp $(BUILD_DIR)/desktop/brickgame $(DIST_DIR)/desktop/brickgame-desktop
+	$(INSTALL) $(DIST_DIR)/desktop/brickgame-desktop $(INSTALL_DIR)
+
+install-cli: cli
+	@echo "Installing CLI version to $(INSTALL_DIR)..."
+	@mkdir -p $(DIST_DIR)/cli
+	cp $(BUILD_DIR)/cli/brickgame $(DIST_DIR)/cli/brickgame-cli
+	$(INSTALL) $(DIST_DIR)/cli/brickgame-cli $(INSTALL_DIR)
+
+install: install-desktop install-cli
+
 uninstall:
-	rm -f $(BINDIR)/$(TARGET)
+	@echo "Uninstalling..."
+	rm -f $(INSTALL_DIR)/brickgame-desktop
+	rm -f $(INSTALL_DIR)/brickgame-cli
+
+clang:
+	@echo "Running clang-format..."
+	cp ../materials/linters/.clang-format .
+	clang-format -i ./brick_game/tetris/*.c ./brick_game/tetris/inc/*.h ./brick_game/snake/*.cpp ./brick_game/snake/inc/*.h ./gui/cli/inc/*.h ./gui/cli/*.c ./gui/desktop/*.cpp ./gui/cli/inc/*.h ./common/*.h
+
+clean:
+	@echo "Cleaning build files..."
+	rm -rf $(BUILD_DIR) $(DIST_DIR)
+	rm -rf docs
+	rm .clang-format
+
 dvi:
+	@echo "Generating documentation..."
 	doxygen Doxyfile
 	open docs/html/index.html
+
 dist:
-	tar -czf $(ARCHIVE_NAME) $(SRC)
-test: clean create_dir $(BACKEND_OBJ_FILES)
-	$(CC) $(BACKEND_OBJ_FILES) -o $@ $(TEST_FLAGS)
-	./$@
-leaks: all
-	leaks -atExit -- ./$(TARGET)
-gcov_report: all 
-	./$(TARGET)
-	lcov --capture --directory . --output-file coverage.info
-	genhtml coverage.info --output-directory coverage
-	open coverage/index.html
-clang:
-	cp ../materials/linters/.clang-format .
-	clang-format -i brick_game/tetris/*.c brick_game/tetris/inc/*.h gui/cli/*.c gui/cli/inc/*.h 
-	clang-format -n brick_game/tetris/*.c brick_game/tetris/inc/*.h gui/cli/*.c gui/cli/inc/*.h
-create_dir:
-	mkdir -p $(BINDIR)
-clean:
-	rm -rf out tetris db.txt
-	rm -rf ../docs coverage docs
-	rm -f $(ARCHIVE_NAME) test coverage.info .clang-format
+	@echo "Creating distribution archive..."
+	mkdir -p $(DIST_DIR)
+	tar -czvf $(DIST_DIR)/$(PROJECT_NAME).tar.gz $(SOURCE_DIR) --exclude=$(BUILD_DIR) --exclude=$(DIST_DIR)
 
-out/%.o: brick_game/tetris/%.c
-	$(CC) $(TETRIS_CFLAGS) -c $< -o $@
+test: test-tetris test-snake
 
-out/%.o: gui/cli/%.c
-	$(CC) $(TETRIS_CFLAGS) -c $< -o $@
+test-tetris:
+	@echo "Running Tetris tests..."
+	@mkdir -p $(BUILD_DIR)/tests/tetris
+	cd $(BUILD_DIR)/tests/tetris && cmake -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_C_FLAGS="--coverage" ../../../
+	cd $(BUILD_DIR)/tests/tetris && make
+	cd $(BUILD_DIR)/tests/tetris && ctest --output-on-failure
+
+test-snake:
+	@echo "Running Snake tests..."
+	@mkdir -p $(BUILD_DIR)/tests/snake
+	cd $(BUILD_DIR)/tests/snake && cmake -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_C_FLAGS="--coverage" ../../../
+	cd $(BUILD_DIR)/tests/snake && make
+	cd $(BUILD_DIR)/tests/snake && ctest --output-on-failure

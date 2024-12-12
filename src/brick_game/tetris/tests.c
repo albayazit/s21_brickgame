@@ -83,14 +83,6 @@ START_TEST(spawn_state_test) {
 }
 END_TEST
 
-START_TEST(start_state_test) {
-  Tetris *tetris = get_tetris();
-  UserAction_t action = Start;
-  start_state(&action);
-  ck_assert_int_eq(tetris->state, SPAWN);
-}
-END_TEST
-
 START_TEST(moving_state_test) {
   UserAction_t action = Down;
   int is_down = 0;
@@ -109,7 +101,7 @@ END_TEST
 START_TEST(get_state_test) {
   Tetris *tetris = get_tetris();
   tetris->state = SPAWN;
-  GameState state = get_state();
+  TetrisState state = get_state();
   ck_assert_int_eq(state, SPAWN);
 }
 END_TEST
@@ -201,7 +193,6 @@ Suite *game_suite(void) {
   tcase_add_test(tc_fsm, attaching_state_test);
   tcase_add_test(tc_fsm, shifting_state_test);
   tcase_add_test(tc_fsm, spawn_state_test);
-  tcase_add_test(tc_fsm, start_state_test);
   tcase_add_test(tc_fsm, moving_state_test);
 
   suite_add_tcase(s, tc_fsm);

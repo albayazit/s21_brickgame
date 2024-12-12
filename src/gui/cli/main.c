@@ -1,111 +1,170 @@
 #include "main.h"
 
-#include <locale.h>
-#include <unistd.h>
-
 /**
- * @brief Main entry point of the Tetris game.
+ * @brief Основная функция программы.
  *
- * This function initializes the game, sets up the locale for character support,
- * initializes the GUI, and starts the game loop. Finally, it cleans up the
- * ncurses environment before exiting the program.
+ * Инициализирует окна, GUI, запускает главное меню, завершает GUI перед
+ * выходом.
  *
- * @return Exit status of the program.
+ * @return Код завершения программы.
  */
 int main() {
+  Windows *windows = getWindows();
   srand(time(0));
   setlocale(LC_ALL, "en_US.UTF-8");
   init_gui();
-  game_loop();
-  free_fields();
+  init_windows(windows);
+  show_menu(windows->game_win);
   endwin();
   return 0;
 }
 
 /**
- * @brief The main loop of the game.
+ * @brief Отображает главное меню программы.
  *
- * This function runs the game loop, handling user input, updating the game
- * state, and rendering the game windows. It continues running until the game is
- * over.
+ * Обрабатывает ввод пользователя для выбора игры или выхода из программы.
+ *
+ * @param win Указатель на окно для отображения меню.
  */
-void game_loop() {
-  Windows windows;
-  GameInfo_t game_info;
-  UserAction_t user_action;
-  bool hold = FALSE;
-  int ch;
-  int start = 1;
-  init_gui();
-  init_windows(&windows);
-  while (game_over()) {
-    game_info = updateCurrentState();
-    if (start) {
-      draw_start(windows.game_win);
-    }
-    if (game_info.pause == 1) {
-      draw_status(windows.info_win, 1);
-    } else {
-      draw_status(windows.info_win, 0);
-    }
-    userInput(user_action, hold);
-    draw_windows(&windows, &game_info, start);
-    ch = getch();
-    get_input(&user_action, &ch, &hold, &start);
-    usleep(10000);
-  }
-  if (get_state() == GAMEOVER) {
-    draw_status(windows.info_win, 2);
-    draw_windows(&windows, &game_info, start);
-    while (getch() == EOF) {
+void show_menu(WINDOW *win) {
+  draw_menu(win);
+  int input;
+  while (input != 'q') {
+    input = getch();
+    if (input == '1') {
+      runTetrisGame();
+      break;
+    } else if (input == '2') {
+      runSnakeGame();
+      break;
     }
   }
 }
 
 /**
- * @brief Processes user input and updates the user action.
+ * @brief Запуск игры Tetris.
  *
- * This function takes the character input from the user and sets the
- * corresponding action for the game based on the key pressed.
- *
- * @param action Pointer to UserAction_t to store the action.
- * @param ch Pointer to the character input.
- * @param hold Pointer to the hold state flag.
- * @param start Pointer to the start flag to indicate game start.
+ * Выполняет игровой цикл для Tetris, обрабатывая ввод пользователя,
+ * обновляя состояние игры и отображая окна с игрой.
  */
-void get_input(UserAction_t *action, int *ch, bool *hold, int *start) {
-  switch (*ch) {
+void runTetrisGame() {
+  Windows *windows = getWindows();
+  GameInfo_t game_info;
+  UserAction_t action;
+  bool hold = FALSE;
+  int input;
+  int start = 1;
+  while (tetrisControllerIsGameOver()) {
+    game_info = tetrisControllerUpdateGame();
+    if (start) {
+      draw_start_win(windows->game_win);
+    } else {
+      draw_game_win(windows->game_win, &game_info);
+    }
+    draw_figure_win(windows->next_fig_win, &game_info);
+    draw_info_win(windows->info_win, &game_info);
+    if (game_info.pause == 1) {
+      draw_status(windows->info_win, 1);
+    } else {
+      draw_status(windows->info_win, 0);
+    }
+    if (get_input(&action)) {
+      tetrisControllerUserInput(&action, hold);
+      if (action == Start) {
+        start = 0;
+      } else if (action == Terminate) {
+        break;
+      }
+    }
+    usleep(10000);
+  }
+  if (!tetrisControllerIsGameOver()) {
+    draw_gameover_win(windows->game_win);
+    while (getch() == EOF) {
+    }
+  }
+  tetrisControllerFreeMemory();
+}
+
+/**
+ * @brief Запуск игры Snake.
+ *
+ * Выполняет игровой цикл для Snake, обрабатывая ввод пользователя,
+ * обновляя состояние игры и отображая окна с игрой.
+ */
+void runSnakeGame() {
+  SnakeControllerWrapper *controller = createSnakeController();
+  Windows *windows = getWindows();
+  GameInfo_t state = snakeControllerUpdateState(controller);
+  draw_start_win(windows->game_win);
+  while (!snakeControllerIsGameOver(controller) &&
+         !snakeControllerIsWinner(controller)) {
+    UserAction_t action;
+    if (get_input(&action)) {
+      snakeControllerUserInput(controller, action, FALSE);
+    }
+    if (snakeControllerIsPlaying(controller)) {
+      state = snakeControllerUpdateState(controller);
+      draw_game_win(windows->game_win, &state);
+    }
+    if (action == Terminate) {
+      break;
+    }
+    draw_info_win(windows->info_win, &state);
+    if (state.pause == 1) {
+      draw_status(windows->info_win, 1);
+    } else {
+      draw_status(windows->info_win, 0);
+    }
+    usleep(10000);
+  }
+  if (snakeControllerIsWinner(controller)) {
+    draw_winner_win(windows->game_win);
+  } else {
+    draw_gameover_win(windows->game_win);
+  }
+  while (getch() == EOF) {
+  }
+  destroySnakeController(controller);
+}
+
+/**
+ * @brief Получает пользовательский ввод и преобразует его в действие.
+ *
+ * @param action Указатель на переменную типа UserAction_t для хранения
+ * результата.
+ * @return Возвращает true, если был введен допустимый символ, иначе false.
+ */
+bool get_input(UserAction_t *action) {
+  int act = getch();
+  switch (act) {
     case '\n':
     case '\r':
     case KEY_ENTER:
       *action = Start;
-      *start = 0;
-      break;
+      return true;
     case 'p':
       *action = Pause;
-      break;
+      return true;
+    case KEY_UP:
+      *action = Up;
+      return true;
     case KEY_LEFT:
       *action = Left;
-      break;
+      return true;
     case KEY_DOWN:
       *action = Down;
-      *hold = TRUE;
-      break;
-    case 'c':
-      *action = Down;
-      *hold = FALSE;
-      break;
+      return true;
     case KEY_RIGHT:
       *action = Right;
-      break;
+      return true;
     case ' ':
       *action = Action;
-      break;
+      return true;
     case 'q':
       *action = Terminate;
-      break;
+      return true;
     default:
-      *action = Up;
-      break;
+      return false;  // Нет ввода или неподдерживаемый символ
   }
-};
+}

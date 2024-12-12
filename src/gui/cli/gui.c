@@ -1,11 +1,10 @@
 #include "gui.h"
 
 /**
- * @brief Initializes the graphical user interface.
+ * @brief Инициализирует GUI для приложения.
  *
- * This function sets up the ncurses library for displaying the game.
- * It configures input settings, starts color support, and initializes
- * keyboard input handling.
+ * Настраивает терминал, отключая буферизацию ввода, отображение символов,
+ * включает цвета и настраивает клавиши управления.
  */
 void init_gui() {
   initscr();  // отключение отображения вводимых символов
@@ -15,35 +14,14 @@ void init_gui() {
   start_color();
   nodelay(stdscr, TRUE);
   init_pair(1, COLOR_GREEN, COLOR_BLACK);
+  init_pair(2, COLOR_RED, COLOR_BLACK);
   keypad(stdscr, TRUE);
 }
 
 /**
- * @brief Draws the game windows.
+ * @brief Инициализирует окна интерфейса.
  *
- * This function renders the game windows based on the current game state.
- *
- * @param windows Pointer to the Windows structure containing window pointers.
- * @param game Pointer to the GameInfo_t structure containing game data.
- * @param is_game Flag indicating if the game is in progress (1) or not (0).
- */
-void draw_windows(Windows *windows, GameInfo_t *game, int is_game) {
-  if (is_game == 0) draw_game_win(windows->game_win, game);
-  draw_figure_win(windows->next_fig_win, game);
-  draw_info_win(windows->info_win, game);
-  refresh();
-  wrefresh(windows->next_fig_win);
-  wrefresh(windows->info_win);
-  wrefresh(windows->game_win);
-}
-
-/**
- * @brief Initializes the game windows.
- *
- * This function creates and configures the windows for the game,
- * next figure, and information display based on terminal size.
- *
- * @param windows Pointer to the Windows structure to be initialized.
+ * @param windows Указатель на структуру Windows, содержащую окна интерфейса.
  */
 void init_windows(Windows *windows) {
   int term_height, term_width;
@@ -55,6 +33,108 @@ void init_windows(Windows *windows) {
       newwin(FIELD_HEIGHT + 2, FIELD_WIDTH * 2 + 2, center_y, center_x - 14);
   windows->next_fig_win = newwin(9, 18, center_y, center_x + 9);
   windows->info_win = newwin(13, 18, center_y + 9, center_x + 9);
+}
+
+/**
+ * @brief Отображает стартовое окно.
+ *
+ * @param win Указатель на окно, в котором будет отображено сообщение.
+ */
+void draw_start_win(WINDOW *win) {
+  wclear(win);
+  wbkgd(win, COLOR_PAIR(1));
+  mvwprintw(win, 10, 1, "%s", "press enter to start");
+  box(win, 0, 0);
+  refresh();
+  wrefresh(win);
+}
+
+/**
+ * @brief Отображает окно "Game Over".
+ *
+ * @param win Указатель на окно, в котором будет отображено сообщение.
+ */
+void draw_gameover_win(WINDOW *win) {
+  wclear(win);
+  wbkgd(win, COLOR_PAIR(1));
+  mvwprintw(win, 4, 7, "%s", "GAMEOVER");
+  mvwprintw(win, 10, 3, "%s", "press any button");
+  box(win, 0, 0);
+  refresh();
+  wrefresh(win);
+}
+
+/**
+ * @brief Отображает окно "Winner".
+ *
+ * @param win Указатель на окно, в котором будет отображено сообщение.
+ */
+void draw_winner_win(WINDOW *win) {
+  wclear(win);
+  wbkgd(win, COLOR_PAIR(1));
+  mvwprintw(win, 4, 8, "%s", "WINNER");
+  mvwprintw(win, 10, 3, "%s", "press any button");
+  box(win, 0, 0);
+  refresh();
+  wrefresh(win);
+}
+
+/**
+ * @brief Получает статическую ссылку на структуру Windows.
+ *
+ * @return Указатель на структуру Windows.
+ */
+Windows *getWindows() {
+  static Windows windows;
+  return &windows;
+}
+
+/**
+ * @brief Отображает главное меню.
+ *
+ * @param win Указатель на окно, в котором будет отображено меню.
+ */
+void draw_menu(WINDOW *win) {
+  wclear(win);
+  wbkgd(win, COLOR_PAIR(1));
+  mvwprintw(win, 3, 4, "%s", "BRICKGAME v2.0");
+  mvwprintw(win, 4, 2, "%s", "-----------------");
+  mvwprintw(win, 5, 2, "%s", "Choose a game:");
+  mvwprintw(win, 6, 2, "%s", "1. Tetris");
+  mvwprintw(win, 7, 2, "%s", "2. Snake");
+  mvwprintw(win, 10, 2, "%s", "-----------------");
+  mvwprintw(win, 11, 2, "%s", "Control:");
+  mvwprintw(win, 12, 2, "%s", "Enter - start");
+  mvwprintw(win, 13, 2, "%s", "Space - action");
+  mvwprintw(win, 14, 2, "%s", "p - pause");
+  mvwprintw(win, 15, 2, "%s", "c - quickly down");
+  mvwprintw(win, 18, 2, "%s", "↑ - to top");
+  mvwprintw(win, 16, 2, "%s", "← - to left");
+  mvwprintw(win, 17, 2, "%s", "→ - to right");
+  mvwprintw(win, 18, 2, "%s", "↓ - to down");
+  mvwprintw(win, 19, 2, "%s", "q - terminate");
+  box(win, 0, 0);
+  refresh();
+  wrefresh(win);
+}
+
+/**
+ * @brief Отображает игровые окна, включая игровое поле, следующую фигуру и
+ * информацию об игре.
+ *
+ * @param windows Указатель на структуру Windows с игровыми окнами.
+ * @param game Указатель на структуру GameInfo_t с информацией об игре.
+ * @param is_game Флаг, определяющий, идет ли игра (0 - игра, 1 - пауза или
+ * другое состояние).
+ */
+void draw_windows(Windows *windows, GameInfo_t *game, int is_game) {
+  if (is_game == 0) draw_game_win(windows->game_win, game);
+  draw_figure_win(windows->next_fig_win, game);
+  draw_info_win(windows->info_win, game);
+  refresh();
+  wrefresh(windows->next_fig_win);
+  wrefresh(windows->info_win);
+  wrefresh(windows->game_win);
 }
 
 /**
@@ -72,6 +152,11 @@ void draw_game_win(WINDOW *win, GameInfo_t *game) {
       if (game->field[row][col] == 1) {
         mvwprintw(win, row, 2 * col + 1, "%s", "█");  // +1 - границы
         mvwprintw(win, row, 2 * col + 2, "%s", "█");
+      } else if (game->field[row][col] == 2) {
+        wattron(win, COLOR_PAIR(2));
+        mvwprintw(win, row, 2 * col + 1, "%s", "█");
+        mvwprintw(win, row, 2 * col + 2, "%s", "█");
+        wattroff(win, COLOR_PAIR(2));
       } else {
         mvwprintw(win, row, 2 * col + 1, "%s", " ");
         mvwprintw(win, row, 2 * col + 2, "%s", " ");
@@ -79,6 +164,8 @@ void draw_game_win(WINDOW *win, GameInfo_t *game) {
     }
   }
   box(win, 0, 0);
+  refresh();
+  wrefresh(win);
 }
 
 /**
@@ -94,7 +181,7 @@ void draw_game_win(WINDOW *win, GameInfo_t *game) {
 void draw_status(WINDOW *win, int status) {
   switch (status) {
     case 0:
-      mvwprintw(win, 2, 3, "%s", "🎮 Tetris 🎮");
+      mvwprintw(win, 2, 4, "%s", "🎮 INFO 🎮");
       break;
     case 1:
       mvwprintw(win, 2, 3, "%s", "              ");
@@ -107,30 +194,8 @@ void draw_status(WINDOW *win, int status) {
     default:
       break;
   }
-}
-
-/**
- * @brief Draws the starting screen.
- *
- * This function displays the instructions and controls on the starting screen.
- *
- * @param win Pointer to the window where the start screen will be displayed.
- */
-void draw_start(WINDOW *win) {
-  wbkgd(win, COLOR_PAIR(1));
-  mvwprintw(win, 3, 5, "%s", "TETRIS GAME");
-  mvwprintw(win, 4, 2, "%s", "-----------------");
-  mvwprintw(win, 5, 2, "%s", "Control:");
-  mvwprintw(win, 6, 2, "%s", "-----------------");
-  mvwprintw(win, 7, 2, "%s", "Enter - start");
-  mvwprintw(win, 8, 2, "%s", "Space - rotation");
-  mvwprintw(win, 9, 2, "%s", "p - pause");
-  mvwprintw(win, 10, 2, "%s", "c - quickly down");
-  mvwprintw(win, 11, 2, "%s", "← - to left");
-  mvwprintw(win, 12, 2, "%s", "→ - to right");
-  mvwprintw(win, 13, 2, "%s", "↓ - slow down");
-  mvwprintw(win, 14, 2, "%s", "q - terminate");
-  box(win, 0, 0);
+  refresh();
+  wrefresh(win);
 }
 
 /**
@@ -155,6 +220,8 @@ void draw_figure_win(WINDOW *win, GameInfo_t *game) {
     }
   }
   box(win, 0, 0);
+  wrefresh(win);
+  refresh();
 }
 
 /**

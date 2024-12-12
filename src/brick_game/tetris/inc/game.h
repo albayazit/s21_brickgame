@@ -1,5 +1,5 @@
-#ifndef GAME_H
-#define GAME_H
+#ifndef SRC_BRICK_GAME_TETRIS_INC_GAME_H
+#define SRC_BRICK_GAME_TETRIS_INC_GAME_H
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -19,7 +19,7 @@ int game_over();
 void init_tetro(Tetris *tetris);
 void plant_tetro();
 void clear_tetro();
-GameState get_state();
+TetrisState get_state();
 void move_left(Tetromino *tetro);
 void move_right(Tetromino *tetro);
 void rotation(Tetromino *tetro);
